@@ -1,13 +1,12 @@
 <?php
 /* 
 *      Robo Gallery     
-*      Version: 3.2.14 - 40722
+*      Version: 5.0.0 - 91909
 *      By Robosoft
 *
 *      Contact: https://robogallery.co/ 
-*      Created: 2021
-*      Licensed under the GPLv2 license - http://opensource.org/licenses/gpl-2.0.php
-
+*      Created: 2025
+*      Licensed under the GPLv3 license - http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 class roboGalleryFieldsField{
@@ -256,7 +255,7 @@ class roboGalleryFieldsField{
 		$token = "";
 
 		for ($i=0; $i < $length; $i++) {
-			$token .= $codeAlphabet[mt_rand(0, $max)];
+			$token .= $codeAlphabet[wp_rand(0, $max)];
 		}
 
 		return $token;
@@ -269,9 +268,51 @@ class roboGalleryFieldsField{
 
 
 	protected function normalize($value){
-		if ($this->cbSanitize && is_callable($this->cbSanitize)) {
-			$value = call_user_func($this->cbSanitize, $value);
+		if ($this->cbSanitize ){
+			if( is_callable($this->cbSanitize)) {
+				$value = call_user_func($this->cbSanitize, $value);
+			}
+
+			if ( method_exists( $this, $this->cbSanitize ) ) {
+				$value = call_user_func( array($this, $this->cbSanitize), $value);
+			}
 		}
+
 		return $value;
 	}
+
+
+	public function sanitizeDigitArrayAsString($value){
+		 $array = $this->sanitizeArray($value);
+
+		for ($i = 0; $i < count($array); $i++) {
+		$array[$i] = (int) $array[$i];
+		}
+
+		return implode( ',', $array );
+	}
+
+	public function sanitizeArrayAsString($value){
+		$array = $this->sanitizeArray($value);
+		return implode( ',', $array );
+	}
+
+	public function sanitizeArray($value){
+		if( is_null($value) ){
+			return array();
+		}
+		
+		if( is_string($value) ){
+			$value = trim($value);
+			if( $value === '' ) return array();
+			 $array = explode( ',', $value );
+		}else{
+			$array = $value;
+		}
+		
+		if( !is_array($array) ){ return array(); }
+
+		return $array;
+	}
+
 }

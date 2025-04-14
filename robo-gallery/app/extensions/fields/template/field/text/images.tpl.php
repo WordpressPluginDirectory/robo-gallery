@@ -1,13 +1,12 @@
 <?php
 /* 
 *      Robo Gallery     
-*      Version: 3.2.14 - 40722
+*      Version: 5.0.0 - 91909
 *      By Robosoft
 *
 *      Contact: https://robogallery.co/ 
-*      Created: 2021
-*      Licensed under the GPLv2 license - http://opensource.org/licenses/gpl-2.0.php
-
+*      Created: 2025
+*      Licensed under the GPLv3 license - http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 if ( ! defined( 'WPINC' ) )  die;
@@ -25,17 +24,17 @@ wp_enqueue_script('jquery-ui-dialog');
 
 
 if(ROBO_GALLERY_DEV){
-	wp_enqueue_script(  ROBO_GALLERY_ASSETS_PREFIX.'-field-type-gallery-lib', ROBO_GALLERY_FIELDS_URL.'asset/fields/gallery/gallery.lib.js', array('jquery'), false, true);
+	wp_enqueue_script(  ROBO_GALLERY_ASSETS_PREFIX.'-field-type-gallery-lib', ROBO_GALLERY_FIELDS_URL.'asset/fields/gallery/gallery.lib.js', array('jquery'), ROBO_GALLERY_VERSION, true);
 
-	wp_enqueue_script(  ROBO_GALLERY_ASSETS_PREFIX.'-field-sortedjs-lib', ROBO_GALLERY_FIELDS_URL.'asset/sortablejs/sortable.js', array(), false, true);
+	wp_enqueue_script(  ROBO_GALLERY_ASSETS_PREFIX.'-field-sortedjs-lib', ROBO_GALLERY_FIELDS_URL.'asset/sortablejs/sortable.js', array(), ROBO_GALLERY_VERSION, true);
 
-	wp_register_script( ROBO_GALLERY_ASSETS_PREFIX.'-field-type-gallery', ROBO_GALLERY_FIELDS_URL.'asset/fields/gallery/script.js', array('jquery', ROBO_GALLERY_ASSETS_PREFIX.'-field-sortedjs-lib'), false, true); //.min
+	wp_register_script( ROBO_GALLERY_ASSETS_PREFIX.'-field-type-gallery', ROBO_GALLERY_FIELDS_URL.'asset/fields/gallery/script.js', array('jquery', ROBO_GALLERY_ASSETS_PREFIX.'-field-sortedjs-lib'), ROBO_GALLERY_VERSION, true); //.min
 } else {
-	wp_enqueue_script(  ROBO_GALLERY_ASSETS_PREFIX.'-field-type-gallery-lib', ROBO_GALLERY_FIELDS_URL.'asset/fields/gallery/js/gallery.lib.min.js', array('jquery'), false, true);
+	wp_enqueue_script(  ROBO_GALLERY_ASSETS_PREFIX.'-field-type-gallery-lib', ROBO_GALLERY_FIELDS_URL.'asset/fields/gallery/js/gallery.lib.min.js', array('jquery'), ROBO_GALLERY_VERSION, true);
 
-	wp_enqueue_script(  ROBO_GALLERY_ASSETS_PREFIX.'-field-sortedjs-lib', ROBO_GALLERY_FIELDS_URL.'asset/sortablejs/sortable.min.js', array(), false, true);
+	wp_enqueue_script(  ROBO_GALLERY_ASSETS_PREFIX.'-field-sortedjs-lib', ROBO_GALLERY_FIELDS_URL.'asset/sortablejs/sortable.min.js', array(), ROBO_GALLERY_VERSION, true);
 
-	wp_register_script( ROBO_GALLERY_ASSETS_PREFIX.'-field-type-gallery', ROBO_GALLERY_FIELDS_URL.'asset/fields/gallery/js/script.min.js', array('jquery', ROBO_GALLERY_ASSETS_PREFIX.'-field-sortedjs-lib'), false, true); //.min	
+	wp_register_script( ROBO_GALLERY_ASSETS_PREFIX.'-field-type-gallery', ROBO_GALLERY_FIELDS_URL.'asset/fields/gallery/js/script.min.js', array('jquery', ROBO_GALLERY_ASSETS_PREFIX.'-field-sortedjs-lib'), ROBO_GALLERY_VERSION, true); //.min	
 }
 
 
@@ -45,16 +44,17 @@ wp_enqueue_script(  ROBO_GALLERY_ASSETS_PREFIX.'-field-type-gallery' );
 $translation_array = array( 
 	'iconUrl' => admin_url('/images/spinner.gif'),		
 	'endpoint' => get_rest_url(null, 'robogallery/v1'),
-	'preview_click' => $config['preview_click']
+	'preview_click' => $config['preview_click'],
+	'images_nonce' => wp_create_nonce( 'wp_rest' ),
 );
 
 wp_localize_script( ROBO_GALLERY_ASSETS_PREFIX.'-field-type-gallery', 'roboGalleryFieldGallery', $translation_array );
 
 wp_enqueue_style ( ROBO_GALLERY_ASSETS_PREFIX.'-field-type-gallery', ROBO_GALLERY_FIELDS_URL.'asset/fields/gallery/style.css', array( ), '' );
 
-if ( $value == null || empty( $value ) || $value == ' ' || $value == '' ) $value = '';
-?>
+$value = is_array($value) ?  implode( ',', $value ) : $value;
 
+?>
 <?php if ($label) : ?>
 	<div class="field small-12 columns">
 		<label>
@@ -68,7 +68,6 @@ if ( $value == null || empty( $value ) || $value == ' ' || $value == '' ) $value
 	<button type="button" data-id="<?php echo $id; ?>" class="success large button expanded roboGalleryFieldImagesButton">
 		<?php _e('Manage Images', 'robo-gallery'); ?>
 	</button>
-	<?php $value = is_array($value) ? implode(',', $value) : $value; ?>
 	<input id="<?php echo $id; ?>" <?php echo $attributes; ?> type="hidden" name="<?php echo $name; ?>" value="<?php echo $value; ?>">
 </div>
 
